@@ -1,0 +1,21 @@
+{
+  "name": "whatsapp-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp AI customer support bot for SMBs using Claude API",
+  "main": "webhook/index.js",
+  "scripts": {
+    "start": "node webhook/index.js",
+    "dev": "node webhook/index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "googleapis": "^118.0.0",
+    "twilio": "^5.13.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
