@@ -1,5 +1,5 @@
-// TODO: Replace with your restricted Anthropic API key (low spend limit, demo-only)
-const ANTHROPIC_API_KEY = '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'; // TODO: Replace with your restricted demo key
+// Proxy endpoint on Render — API key lives in server env vars, never in this file
+const PROXY_URL = 'https://whatsapp-bot-webhook-6g0d.onrender.com/demo/chat';
 
 const SALON_SYSTEM_PROMPT = `
 You are a friendly, professional WhatsApp assistant for Bella's Salon.
@@ -108,19 +108,12 @@ const setInputDisabled = (disabled) => {
   sendBtn.disabled = disabled;
 };
 
-// ── Claude API call ───────────────────────────────────────────────────────────
+// ── Claude API call (via Render proxy) ───────────────────────────────────────
 const getBotReply = async (userMessage) => {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch(PROXY_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 200,
       system: SALON_SYSTEM_PROMPT,
       messages: [
         ...conversationHistory,
@@ -131,7 +124,7 @@ const getBotReply = async (userMessage) => {
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error ${response.status}`);
+    throw new Error(err.error || `API error ${response.status}`);
   }
 
   const data = await response.json();
