@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Bot Demo — Bella's Salon</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="page-wrapper">
+    <h1 class="demo-headline">Try it — text the bot</h1>
+    <p class="demo-subtext">This is a live AI assistant, exactly like what your customers would experience on WhatsApp.</p>
+
+    <div class="whatsapp-container">
+
+      <!-- Header bar -->
+      <div class="wa-header">
+        <div class="wa-avatar">B</div>
+        <div class="wa-header-info">
+          <div class="wa-name">Bella's Salon</div>
+          <div class="wa-status">Online</div>
+        </div>
+      </div>
+
+      <!-- Message area -->
+      <div class="wa-messages" id="messages">
+        <!-- Messages injected by demo.js -->
+      </div>
+
+      <!-- Input bar -->
+      <div class="wa-input-bar">
+        <input
+          type="text"
+          id="user-input"
+          class="wa-input"
+          placeholder="Type a message"
+          autocomplete="off"
+        />
+        <button id="send-btn" class="wa-send-btn" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="#fff">
+            <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <p class="demo-footnote">Powered by Claude AI · Built by Sentinel AI</p>
+  </div>
+
+  <script src="demo.js"></script>
+</body>
+</html>
