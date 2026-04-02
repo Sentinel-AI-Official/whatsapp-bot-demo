@@ -1,5 +1,5 @@
 // TODO: Replace with your restricted Anthropic API key (low spend limit, demo-only)
-const ANTHROPIC_API_KEY = 'YOUR_ANTHROPIC_API_KEY_HERE'; // TODO: Replace with your restricted demo key
+const ANTHROPIC_API_KEY = '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'; // TODO: Replace with your restricted demo key
 
 const SALON_SYSTEM_PROMPT = `
 You are a friendly, professional WhatsApp assistant for Bella's Salon.
