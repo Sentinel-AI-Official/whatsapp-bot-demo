@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WhatsApp Bot Demo — Bella's Salon</title>
+  <title>WhatsApp Bot Demo — Sentinel AI</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -12,13 +12,20 @@
     <h1 class="demo-headline">Try it — text the bot</h1>
     <p class="demo-subtext">This is a live AI assistant, exactly like what your customers would experience on WhatsApp.</p>
 
+    <!-- Industry switcher -->
+    <div class="industry-switcher">
+      <button class="industry-btn active" data-industry="salon">Salon</button>
+      <button class="industry-btn" data-industry="restaurant">Restaurant</button>
+      <button class="industry-btn" data-industry="clinic">Clinic</button>
+    </div>
+
     <div class="whatsapp-container">
 
       <!-- Header bar -->
       <div class="wa-header">
-        <div class="wa-avatar">B</div>
+        <div class="wa-avatar" id="wa-avatar">B</div>
         <div class="wa-header-info">
-          <div class="wa-name">Bella's Salon</div>
+          <div class="wa-name" id="wa-name">Bella's Salon</div>
           <div class="wa-status">Online</div>
         </div>
       </div>
