@@ -1,6 +1,12 @@
 # Environment variables — never commit these
 .env
 
+# Google service account keys — never commit these
+*.json
+!package.json
+!package-lock.json
+!knowledge-base/*.json
+
 # Dependencies
 node_modules/
 
