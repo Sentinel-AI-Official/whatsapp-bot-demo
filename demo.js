@@ -1,5 +1,5 @@
-// Proxy endpoint on Render — API key lives in server env vars, never in this file
-const PROXY_URL = 'https://whatsapp-bot-webhook-6g0d.onrender.com/demo/chat';
+// Proxy endpoint — Vercel serverless function, API key lives in server env vars, never in this file
+const PROXY_URL = '/api/demo-chat';
 
 // ── System Prompts ────────────────────────────────────────────────────────────
 
