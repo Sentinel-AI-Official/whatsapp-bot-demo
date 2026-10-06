@@ -1,0 +1,25 @@
+{
+  "business_name": "Bella's Salon",
+  "hours": "Monday to Saturday: 10am – 8pm\nSunday: 11am – 6pm",
+  "address": "42 MG Road, Near Metro Station, Bangalore 560001",
+  "booking_link": "https://calendly.com/bellassalon",
+  "phone": "+91 98765 43210",
+  "services": [
+    "Haircut & Styling",
+    "Hair Colouring & Highlights",
+    "Keratin Treatment",
+    "Facial & Clean-up",
+    "Waxing & Threading",
+    "Bridal Packages"
+  ],
+  "pricing": {
+    "haircut": "₹300 – ₹800 (length dependent)",
+    "colour": "Starting ₹1,200",
+    "keratin": "Starting ₹3,500",
+    "facial": "₹600 – ₹1,500",
+    "waxing_full": "₹800"
+  },
+  "cancellation_policy": "Please cancel at least 4 hours in advance. Late cancellations may incur a 50% charge.",
+  "parking": "Free parking available in the building basement",
+  "payment_methods": "Cash, UPI, all major cards accepted"
+}

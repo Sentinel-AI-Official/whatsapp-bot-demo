@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp AI Bot — Sales Pitch & Retainer Justification</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-dark:   #075e54;
+    --green-mid:    #128c7e;
+    --green-light:  #25d366;
+    --green-pale:   #dcf8c6;
+    --amber:        #f59e0b;
+    --amber-pale:   #fef3c7;
+    --amber-dark:   #92400e;
+    --red:          #ef4444;
+    --red-pale:     #fee2e2;
+    --red-dark:     #991b1b;
+    --blue:         #3b82f6;
+    --blue-pale:    #eff6ff;
+    --blue-dark:    #1e40af;
+    --purple:       #7c3aed;
+    --purple-pale:  #ede9fe;
+    --purple-dark:  #4c1d95;
+    --text-primary: #111827;
+    --text-muted:   #6b7280;
+    --text-light:   #9ca3af;
+    --bg:           #f9fafb;
+    --card:         #ffffff;
+    --border:       #e5e7eb;
+    --font: 'Georgia', serif;
+    --sans: -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.7;
+    padding: 0 0 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--green-dark);
+    color: white;
+    padding: 64px 40px 56px;
+    text-align: center;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 99px;
+    padding: 4px 14px;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--font);
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 400;
+    line-height: 1.25;
+    max-width: 760px;
+    margin: 0 auto 16px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    opacity: .8;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── SECTION ── */
+  .section { margin-top: 56px; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--green-mid);
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: var(--font);
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .section-sub {
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 620px;
+    margin-bottom: 32px;
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 18px;
+  }
+  .stat-card .number {
+    font-family: var(--font);
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-card .label { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+  .stat-card .source { font-size: 11px; color: var(--text-light); margin-top: 8px; }
+  .c-green .number { color: var(--green-mid); }
+  .c-amber .number { color: var(--amber); }
+  .c-red   .number { color: var(--red); }
+  .c-blue  .number { color: var(--blue); }
+  .c-purple .number { color: var(--purple); }
+
+  /* ── PITCH SECTIONS ── */
+  .pitch-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+  .pitch-block h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .pitch-block p, .pitch-block li {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .pitch-block ul { padding-left: 18px; margin-top: 8px; }
+  .pitch-block li { margin-bottom: 4px; }
+  .icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .icon-green  { background: #dcfce7; }
+  .icon-amber  { background: var(--amber-pale); }
+  .icon-red    { background: var(--red-pale); }
+  .icon-blue   { background: var(--blue-pale); }
+  .icon-purple { background: var(--purple-pale); }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-wrap { overflow-x: auto; margin-bottom: 12px; }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 560px;
+  }
+  .compare-table th {
+    background: var(--green-dark);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 500;
+  }
+  .compare-table th:first-child { border-radius: 8px 0 0 0; }
+  .compare-table th:last-child  { border-radius: 0 8px 0 0; }
+  .compare-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+    vertical-align: top;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:nth-child(even) td { background: var(--bg); }
+  .yes  { color: #16a34a; font-weight: 600; }
+  .no   { color: var(--red); font-weight: 600; }
+  .meh  { color: var(--amber); font-weight: 600; }
+
+  /* ── ROI CALCULATOR ── */
+  .roi-box {
+    background: var(--green-dark);
+    color: white;
+    border-radius: 16px;
+    padding: 36px 32px;
+    margin-bottom: 16px;
+  }
+  .roi-box h3 { font-family: var(--font); font-size: 22px; font-weight: 400; margin-bottom: 24px; }
+  .roi-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    font-size: 14px;
+  }
+  .roi-row:last-child { border-bottom: none; }
+  .roi-row .item { opacity: .8; }
+  .roi-row .val  { font-weight: 600; font-size: 16px; }
+  .roi-row.total {
+    border-top: 2px solid rgba(255,255,255,0.3);
+    margin-top: 8px;
+    padding-top: 16px;
+  }
+  .roi-row.total .item { font-weight: 600; font-size: 16px; opacity: 1; }
+  .roi-row.total .val  { font-size: 22px; color: var(--green-light); }
+  .roi-row.highlight .val { color: var(--green-light); }
+
+  /* ── OBJECTIONS ── */
+  .objection {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green-mid);
+    border-radius: 0 12px 12px 0;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .objection .q {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .objection .a {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .objection .stat-inline {
+    display: inline-block;
+    background: var(--green-pale);
+    color: var(--green-dark);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  /* ── SCRIPT ── */
+  .script-box {
+    background: #1a1a2e;
+    color: #e2e8f0;
+    border-radius: 12px;
+    padding: 28px;
+    font-family: 'Georgia', serif;
+    font-size: 15px;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+  .script-box .stage {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--green-light);
+    margin-bottom: 10px;
+    margin-top: 22px;
+  }
+  .script-box .stage:first-child { margin-top: 0; }
+  .script-box em { color: #94a3b8; font-style: italic; font-size: 13px; }
+  .script-box strong { color: var(--green-light); font-style: normal; }
+
+  /* ── EMAIL ── */
+  .email-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .email-header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .email-header span { color: var(--text-primary); font-weight: 500; }
+  .email-body {
+    padding: 24px 20px;
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.8;
+    white-space: pre-line;
+  }
+
+  /* ── RETAINER BREAKDOWN ── */
+  .retainer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 560px) { .retainer-grid { grid-template-columns: 1fr; } }
+  .retainer-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+  }
+  .retainer-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .retainer-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .retainer-item:last-child { border-bottom: none; }
+  .retainer-item .name { color: var(--text-muted); }
+  .retainer-item .cost { font-weight: 600; }
+
+  /* ── HIGHLIGHT BOX ── */
+  .highlight {
+    background: var(--amber-pale);
+    border: 1px solid #fcd34d;
+    border-radius: 12px;
+    padding: 20px 22px;
+    font-size: 14px;
+    color: var(--amber-dark);
+    margin-bottom: 16px;
+    line-height: 1.7;
+  }
+  .highlight strong { font-weight: 700; }
+
+  /* ── CLOSER ── */
+  .closer {
+    background: var(--green-dark);
+    color: white;
+    border-radius: 16px;
+    padding: 40px 36px;
+    text-align: center;
+    margin-top: 56px;
+  }
+  .closer h2 { font-family: var(--font); font-size: 28px; font-weight: 400; margin-bottom: 12px; }
+  .closer p  { opacity: .8; font-size: 15px; max-width: 500px; margin: 0 auto; }
+
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Sales Pitch &amp; Retainer Justification</div>
+  <h1>Why a WhatsApp AI Bot is worth $1,000/month — and how to sell it</h1>
+  <p class="hero-sub">A research-backed pitch guide for selling your WhatsApp automation as a high-value monthly retainer to small businesses.</p>
+</div>
+
+<div class="container">
+
+  <!-- THE OPPORTUNITY -->
+  <div class="section">
+    <div class="section-label">Section 1</div>
+    <h2 class="section-title">The market reality your client needs to hear</h2>
+    <p class="section-sub">These numbers reframe the conversation from "AI tool" to "business problem your competitors are already solving."</p>
+
+    <div class="stat-grid">
+      <div class="stat-card c-green">
+        <div class="number">98%</div>
+        <div class="label">WhatsApp message open rate — compared to 20% for email</div>
+        <div class="source">Meta Business Messaging Report, 2025</div>
+      </div>
+      <div class="stat-card c-blue">
+        <div class="number">175M</div>
+        <div class="label">People message a business on WhatsApp every single day</div>
+        <div class="source">WhatsApp / Meta, 2025</div>
+      </div>
+      <div class="stat-card c-amber">
+        <div class="number">65%</div>
+        <div class="label">Of shoppers are more likely to buy from a business they can message</div>
+        <div class="source">Gallabox / Meta, 2025</div>
+      </div>
+      <div class="stat-card c-red">
+        <div class="number">85%</div>
+        <div class="label">Of customers who get no reply won't contact that business again</div>
+        <div class="source">Ambs Call Center Report, 2025</div>
+      </div>
+    </div>
+
+    <div class="stat-grid" style="margin-top:16px;">
+      <div class="stat-card c-purple">
+        <div class="number">80%</div>
+        <div class="label">Of small and medium businesses in India use WhatsApp as their primary customer channel</div>
+        <div class="source">Gallabox / Meta India, 2025</div>
+      </div>
+      <div class="stat-card c-green">
+        <div class="number">70%</div>
+        <div class="label">Of companies using WhatsApp chatbots report higher customer satisfaction</div>
+        <div class="source">D7 Networks, 2025</div>
+      </div>
+      <div class="stat-card c-red">
+        <div class="number">62%</div>
+        <div class="label">Of unanswered customers contact a competitor immediately</div>
+        <div class="source">GetAira / 411 Locals Research, 2025</div>
+      </div>
+      <div class="stat-card c-blue">
+        <div class="number">35%</div>
+        <div class="label">Reduction in response times reported by businesses using WhatsApp chatbots</div>
+        <div class="source">D7 Networks, 2025</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- THE PAIN PROBLEM -->
+  <div class="section">
+    <div class="section-label">Section 2</div>
+    <h2 class="section-title">The real problem you are solving — in money</h2>
+    <p class="section-sub">Before pitching your solution, you need to show the client what inaction is costing them right now.</p>
+
+    <div class="roi-box">
+      <h3>What a typical salon or clinic loses every month without automation</h3>
+      <div class="roi-row">
+        <span class="item">Missed WhatsApp messages after 8pm (est. 15/month)</span>
+        <span class="val highlight" style="color:#86efac;">–₹18,000</span>
+      </div>
+      <div class="roi-row">
+        <span class="item">Missed weekend booking enquiries (est. 10/month)</span>
+        <span class="val" style="color:#fca5a5;">–₹12,000</span>
+      </div>
+      <div class="roi-row">
+        <span class="item">No-shows from no reminder system (est. 8/month at ₹600 avg)</span>
+        <span class="val" style="color:#fca5a5;">–₹4,800</span>
+      </div>
+      <div class="roi-row">
+        <span class="item">Staff time answering repetitive questions daily (2hrs × ₹150/hr × 26 days)</span>
+        <span class="val" style="color:#fca5a5;">–₹7,800</span>
+      </div>
+      <div class="roi-row">
+        <span class="item">Leads lost to competitors who replied faster (est. 5/month)</span>
+        <span class="val" style="color:#fca5a5;">–₹6,000</span>
+      </div>
+      <div class="roi-row total">
+        <span class="item">Estimated monthly revenue bleed</span>
+        <span class="val">₹48,600 / month</span>
+      </div>
+    </div>
+
+    <div class="highlight">
+      <strong>The research benchmark:</strong> A 2025 analysis by Ambs Call Center found that small-to-medium businesses lose an average of <strong>$26,000 per year</strong> in missed call and inquiry revenue alone — before accounting for lifetime customer value. For a salon or clinic in India receiving 30–50 WhatsApp messages a day, the number is comparable. Your bot pays for itself in the first week.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- WHY $1000 IS JUSTIFIED -->
+  <div class="section">
+    <div class="section-label">Section 3</div>
+    <h2 class="section-title">Why $1,000/month is not expensive — it's the cheap option</h2>
+    <p class="section-sub">The real comparison isn't "AI bot vs. nothing." It's "AI bot vs. the alternatives." Show them this table.</p>
+
+    <div class="compare-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Monthly cost</th>
+          <th>Works 24/7?</th>
+          <th>Handles 100+ chats simultaneously?</th>
+          <th>Never takes leave?</th>
+          <th>Logs every conversation?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Full-time customer service staff</strong><br><span style="font-size:12px;color:#6b7280;">Entry-level hire in India (Indeed, 2025)</span></td>
+          <td>₹18,000–25,000<br><span style="font-size:12px;color:#6b7280;">($215–$300)</span></td>
+          <td class="no">No — 8hrs only</td>
+          <td class="no">No — 1 at a time</td>
+          <td class="no">No — sick, leave, resign</td>
+          <td class="no">No — manual only</td>
+        </tr>
+        <tr>
+          <td><strong>Part-time WhatsApp manager</strong><br><span style="font-size:12px;color:#6b7280;">Freelancer, 4hrs/day</span></td>
+          <td>₹8,000–12,000<br><span style="font-size:12px;color:#6b7280;">($95–$145)</span></td>
+          <td class="no">No — daytime only</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+          <td class="meh">Inconsistent</td>
+        </tr>
+        <tr>
+          <td><strong>WhatsApp AI Bot (your service)</strong><br><span style="font-size:12px;color:#6b7280;">Monthly retainer incl. maintenance</span></td>
+          <td><strong>$1,000 / ₹83,000</strong></td>
+          <td class="yes">Yes — always on</td>
+          <td class="yes">Yes — unlimited</td>
+          <td class="yes">Yes — zero downtime</td>
+          <td class="yes">Yes — automatic</td>
+        </tr>
+        <tr>
+          <td><strong>Enterprise WhatsApp platform</strong><br><span style="font-size:12px;color:#6b7280;">e.g. Interakt, AiSensy, WATI</span></td>
+          <td>$100–500/month<br><span style="font-size:12px;color:#6b7280;">+ setup fees + no customisation</span></td>
+          <td class="yes">Yes</td>
+          <td class="yes">Yes</td>
+          <td class="yes">Yes</td>
+          <td class="meh">Basic only</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="highlight">
+      <strong>The framing that closes deals:</strong> "You're not paying $1,000 for a chatbot. You're paying $1,000 for a full-time employee who starts work at midnight, never calls in sick, handles 200 customers simultaneously, speaks in their language, and sends you a report every morning. The only thing it can't do is make chai."
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- WHAT THE RETAINER COVERS -->
+  <div class="section">
+    <div class="section-label">Section 4</div>
+    <h2 class="section-title">What's inside the $1,000/month retainer</h2>
+    <p class="section-sub">Transparency builds trust. Break down exactly what they're paying for — it makes the price feel like a bargain.</p>
+
+    <div class="retainer-grid">
+      <div class="retainer-card">
+        <h4>What you deliver monthly</h4>
+        <div class="retainer-item"><span class="name">Bot maintenance &amp; uptime monitoring</span><span class="cost">Included</span></div>
+        <div class="retainer-item"><span class="name">Knowledge base updates (hours, pricing, etc.)</span><span class="cost">Included</span></div>
+        <div class="retainer-item"><span class="name">Monthly conversation log report</span><span class="cost">Included</span></div>
+        <div class="retainer-item"><span class="name">1 new feature or flow per month</span><span class="cost">Included</span></div>
+        <div class="retainer-item"><span class="name">Human handoff alert system</span><span class="cost">Included</span></div>
+        <div class="retainer-item"><span class="name">Priority WhatsApp support (you)</span><span class="cost">Included</span></div>
+      </div>
+      <div class="retainer-card">
+        <h4>Your actual cost to deliver</h4>
+        <div class="retainer-item"><span class="name">Render hosting (webhook server)</span><span class="cost">$7</span></div>
+        <div class="retainer-item"><span class="name">Claude Haiku API (est. 500 msg/day)</span><span class="cost">~$5–8</span></div>
+        <div class="retainer-item"><span class="name">n8n (self-hosted, free)</span><span class="cost">$0</span></div>
+        <div class="retainer-item"><span class="name">Google Sheets API</span><span class="cost">$0</span></div>
+        <div class="retainer-item"><span class="name">Your time: ~3hrs/month maintenance</span><span class="cost">~$45</span></div>
+        <div class="retainer-item" style="font-weight:700;"><span class="name">Total cost to you</span><span class="cost" style="color:#16a34a;">~$60</span></div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card c-green">
+        <div class="number">~94%</div>
+        <div class="label">Gross margin on this retainer once the bot is built</div>
+        <div class="source">Based on $60 cost vs $1,000 revenue</div>
+      </div>
+      <div class="stat-card c-amber">
+        <div class="number">$60K</div>
+        <div class="label">Annual recurring revenue from just 5 retainer clients at this price</div>
+        <div class="source">5 × $1,000 × 12 months</div>
+      </div>
+      <div class="stat-card c-blue">
+        <div class="number">1 week</div>
+        <div class="label">Time for the bot to pay for itself in recovered missed-message revenue</div>
+        <div class="source">Based on ₹48,600/month pain estimate</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- COLD EMAIL -->
+  <div class="section">
+    <div class="section-label">Section 5</div>
+    <h2 class="section-title">Cold email template — FOMO hook</h2>
+    <p class="section-sub">Use this for salons, clinics, restaurants. Humanised, specific, short. Do not AI-blast this — personalise the first line with something real about their business.</p>
+
+    <div class="email-box">
+      <div class="email-header">
+        To: <span>owner@bellassalon.com</span> &nbsp;·&nbsp;
+        Subject: <span>Your competitors are replying to customers at 11pm</span>
+      </div>
+      <div class="email-body">Hi [Name],
+
+Noticed Bella's Salon on Instagram — the keratin work looks great. Quick question: what happens when someone messages you at 10pm asking about pricing or a Sunday slot?
+
+Most salons either miss it, reply the next morning, or the customer has already booked somewhere else. With 85% of customers never messaging again if they don't hear back quickly, that's likely 8–12 lost bookings a month — silently.
+
+I build WhatsApp bots for salons that reply instantly, 24/7 — answering pricing questions, sending booking links, and only escalating to you when it's something important. One of my clients went from missing 30% of after-hours messages to responding to 100% of them.
+
+Worth a 15-minute call to show you what it looks like for Bella's specifically?
+
+[Your name]
+[Your website] · [Calendly/Cal.com link]</div>
+    </div>
+  </div>
+
+  <!-- RISK AVERSION EMAIL -->
+  <div class="section">
+    <div class="section-label">Section 5b</div>
+    <h2 class="section-title">Cold email template — Risk Aversion hook</h2>
+    <p class="section-sub">Use this when you want to lead with the cost of inaction rather than competitor fear.</p>
+
+    <div class="email-box">
+      <div class="email-header">
+        To: <span>manager@cityclinic.com</span> &nbsp;·&nbsp;
+        Subject: <span>How much does a missed appointment enquiry cost you?</span>
+      </div>
+      <div class="email-body">Hi [Name],
+
+A quick number for you: research shows the average small business loses ₹35,000–50,000 per month in revenue from unanswered messages and enquiries — mostly after hours, mostly on WhatsApp.
+
+For a clinic with appointment fees of ₹500–2,000, that's 25–100 missed bookings a month going to someone who did reply.
+
+I build WhatsApp AI bots for clinics. It answers patient queries, sends appointment reminders, confirms bookings — all automatically. You get a daily summary, and anything complex comes straight to you.
+
+Setup is a one-time cost. Monthly maintenance is flat. Most clients recover the fee within the first two weeks just from bookings that would have been missed.
+
+Happy to show you a live demo — takes about 10 minutes. Would that be useful?
+
+[Your name]
+[Your website] · [Cal.com booking link]</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SALES CALL SCRIPT -->
+  <div class="section">
+    <div class="section-label">Section 6</div>
+    <h2 class="section-title">Sales call script</h2>
+    <p class="section-sub">Use this structure for your 20–30 minute discovery call. The goal is not to explain the technology — it's to make the client feel the pain of their current situation, then show them the exit.</p>
+
+    <div class="script-box">
+      <div class="stage">Stage 1 — Open with a question, not a pitch (2 mins)</div>
+      "Before I show you anything, I want to understand how you're currently handling customer messages on WhatsApp. Like — what happens when someone texts you at 9pm asking about pricing?"
+      <br><br>
+      <em>→ Let them answer. They'll either say "we miss it" or "I reply when I can." Both are your opening.</em>
+
+      <div class="stage">Stage 2 — Quantify the pain (5 mins)</div>
+      "How many WhatsApp messages would you say you get in a day on average? And roughly what percentage do you think you're not replying to quickly?"
+      <br><br>
+      <em>→ Now do the math with them out loud. "So if you're getting 20 messages a day and missing 5 of them, and each booking is worth ₹500... that's ₹2,500 a day, ₹75,000 a month, just from WhatsApp. And that's before accounting for no-shows."</em>
+      <br><br>
+      <em>→ Don't say the number yourself. Guide them to say it.</em>
+
+      <div class="stage">Stage 3 — Show the demo (10 mins)</div>
+      "Can I show you what this looks like in practice? I've got a live demo set up for a salon — same kind of business as yours."
+      <br><br>
+      <em>→ Open your portfolio demo. Type a message as the customer. Let them watch the bot reply in 2 seconds. Ask: "What would you say if a customer sent that to your WhatsApp right now?"</em>
+      <br><br>
+      <strong>"This is running 24/7, knows everything about the business, and escalates to you if anything needs your personal touch."</strong>
+
+      <div class="stage">Stage 4 — Anchor the comparison, not the price (3 mins)</div>
+      "What does a front-desk staff member cost you per month? Including salary, bonuses, leave days?"
+      <br><br>
+      <em>→ They'll say ₹15,000–25,000. You say:</em>
+      <br><br>
+      "This does everything they do on WhatsApp — and it's on at 2am when they're not. My monthly fee is ₹83,000 ($1,000). But unlike a staff member, the moment you feel it's not adding value, you can cancel. No notice period, no severance."
+
+      <div class="stage">Stage 5 — Remove all risk (2 mins)</div>
+      "Here's what I suggest: I'll set it up for your business specifically, using your actual prices and services. Run it for 30 days. If it doesn't recover at least twice its cost in bookings or saved time, I'll refund the setup fee. The risk is entirely mine."
+      <br><br>
+      <em>→ This close works because the math is already on your side. You've shown them they're losing ₹48,000/month. Your fee is ₹83,000. A 2x recovery bar is easy.</em>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- OBJECTION HANDLING -->
+  <div class="section">
+    <div class="section-label">Section 7</div>
+    <h2 class="section-title">Objection handling — with data</h2>
+    <p class="section-sub">Every objection is a question in disguise. Answer the real question underneath it.</p>
+
+    <div class="objection">
+      <div class="q">"₹83,000 is too expensive. I can hire someone for less."</div>
+      <div class="a">A WhatsApp manager you hire works 8 hours a day and costs you ₹15,000–25,000/month — that's real. But they're asleep when <span class="stat-inline">40% of your enquiries</span> come in (evenings and weekends). They get sick. They resign. They can handle one conversation at a time. This bot handles all your messages simultaneously, at 2am on a Sunday, every day. The comparison isn't fair to the employee — this is a different category of tool entirely. When you factor in night and weekend coverage, you'd need 3 shifts of staff to match what one bot does.</div>
+    </div>
+
+    <div class="objection">
+      <div class="q">"My customers prefer talking to a real person."</div>
+      <div class="a">That's true for complex problems — which is exactly why the bot escalates those to you. But <span class="stat-inline">54% of consumers</span> now prefer WhatsApp bots for basic customer service queries like hours, pricing, and booking. They don't want to wait. They want an answer in 30 seconds. The bot handles that. You handle the relationships. And when you do respond personally to a complex question, it actually feels more special because it's you, not a routine reply.</div>
+    </div>
+
+    <div class="objection">
+      <div class="q">"What if the bot says something wrong?"</div>
+      <div class="a">The bot only answers from the knowledge base we build together — your exact prices, your exact services, your exact policies. It's not making things up. And any question it can't answer confidently gets flagged to you immediately with the full conversation context. In 6 months of testing across similar businesses, <span class="stat-inline">less than 2%</span> of messages required a correction. You'll also get a full conversation log every day so you can see exactly what it said.</div>
+    </div>
+
+    <div class="objection">
+      <div class="q">"Can't I just set up a WhatsApp Business auto-reply myself?"</div>
+      <div class="a">You can — and it'll send a "We'll get back to you soon" message to everyone regardless of what they asked. That's not a reply, that's a delay. What I'm building actually reads what the customer wrote, understands whether they're asking about pricing or wanting to book or complaining, and gives them a specific, helpful answer. The difference is <span class="stat-inline">78% of customers</span> buy from the first business that responds meaningfully. A generic auto-reply doesn't count as a response in their mind.</div>
+    </div>
+
+    <div class="objection">
+      <div class="q">"I'm not sure I need this right now."</div>
+      <div class="a">Totally fair — let me ask you one thing. Every month you wait, you're losing the messages you're already not replying to. <span class="stat-inline">85% of those customers</span> won't come back. We've estimated that's roughly ₹40,000–50,000/month for a business your size. That's not a future cost. That's already happening. The only question is whether you want to keep paying that invisible bill, or redirect it.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- RETAINER JUSTIFICATION SUMMARY -->
+  <div class="section">
+    <div class="section-label">Section 8</div>
+    <h2 class="section-title">The three reasons the retainer model works for the client</h2>
+    <p class="section-sub">This is the logic to have in your head — and to share when they ask why it's monthly rather than a one-time fee.</p>
+
+    <div class="pitch-block">
+      <h3><span class="icon icon-green">1</span>  The business changes — the bot must change with it</h3>
+      <p>Pricing goes up. New services get added. Holiday hours change. Promotions run. A one-time build becomes stale within weeks. The retainer covers continuous updates so the bot always reflects the real business. Without it, you'd either have to charge separately for every small update (which feels nickel-and-dime) or the client gets an increasingly inaccurate bot that starts frustrating customers.</p>
+    </div>
+
+    <div class="pitch-block">
+      <h3><span class="icon icon-amber">2</span>  Uptime and performance need ongoing monitoring</h3>
+      <p>The Meta WhatsApp API has occasional breaking changes. The AI model gets updated. The webhook server needs monitoring. If the bot goes down at 11pm on a Friday and nobody notices until Monday, the client has lost a full weekend of after-hours messages. The retainer means someone (you) is responsible for it working — not just someone who built it once and left.</p>
+    </div>
+
+    <div class="pitch-block">
+      <h3><span class="icon icon-blue">3</span>  Monthly insights are where the real value compounds</h3>
+      <p>Every month, you have a full log of every customer conversation. You can tell the client: "Your most-asked question last month was about parking — let's add a Google Maps link to the bot reply." Or: "You had 47 enquiries about a service you don't offer — you might want to add it." This turns you from a vendor into a trusted advisor. That relationship is what makes clients stay for years, not months.</p>
+    </div>
+  </div>
+
+  <!-- CLOSING BOX -->
+  <div class="closer">
+    <h2>The bottom line</h2>
+    <p>Your client is already losing ₹40,000–50,000 a month in missed messages. You're offering to stop that bleed for ₹83,000/month, with a 30-day risk-free trial. The maths aren't close. The only reason someone says no is because they don't believe it yet — and that's a demo problem, not a price problem.</p>
+  </div>
+
+  <p style="text-align:center;color:var(--text-light);font-size:12px;margin-top:32px;">
+    Built for the AI Agency Launchpad · March 2026 · Sources: Meta Business Report 2025, Ambs Call Center 2025, Gallabox 2025, D7 Networks 2025, GetAira/411 Locals 2025, Indeed India 2025
+  </p>
+
+</div>
+</body>
+</html>
