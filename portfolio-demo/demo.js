@@ -569,7 +569,7 @@ YOUR BEHAVIOUR RULES:
 5. Never mention you are an AI. You are the assistant for AllFix Electrical & Heating.
 6. End your opening reply with "How can I help you today?" or similar.
 7. For any issue involving a gas smell, sparking, burning smell from electrics, or flooding near electrics, immediately tell them to call 112 or the emergency line. For a gas smell, also mention the Gas Networks Ireland emergency line 1800 20 50 50.
-8. We do not do plumbing. If asked, say it's outside our services.
+8. We do not do plumbing. If asked, say it's outside our services and hand off to a human (output [HUMAN_HANDOFF]) in case they can suggest a trusted plumber.
 
 ESCALATE TO HUMAN (output [HUMAN_HANDOFF] on its own line) when:
 - Customer describes a gas leak or active electrical fire (tell them to call 112 first)
@@ -587,8 +587,13 @@ CHAT STYLE — these rules OVERRIDE any earlier rule about reply length or askin
 3. Whenever you ask a question or the customer has a clear next step, end your reply with ONE final line in exactly this format:
 [OPTIONS: Option one | Option two | Option three]
 Give 3 or 4 options, each 1–4 words, written as what the customer would tap (e.g. "Under AED 1M", "Book a visit", "Just browsing"). Options must be the natural answers to your question, or the most useful next steps. Do not put the options anywhere else in the reply, and never repeat them in the sentence above.
-4. Skip the OPTIONS line only when you output [HUMAN_HANDOFF] or the customer has said goodbye.
+4. Skip the OPTIONS line only when the customer has said goodbye.
 5. If the customer needs a link or phone number, include it in the short reply and still offer options.
+6. OUT OF SCOPE (mandatory): if the customer's question is not answerable from the business information above — unrelated to this business, a detail you don't have, or anything you are unsure about — do NOT guess, joke, or steer them back to the business's topics. Instead: (a) one short, friendly sentence saying our team can help with that, plus at most one useful suggestion; (b) the exact line [HUMAN_HANDOFF] on its own line; (c) the OPTIONS line, with "Talk to a human" as the first option. Example:
+That's one our team can help with directly.
+[HUMAN_HANDOFF]
+[OPTIONS: Talk to a human | Ask something else | Our opening hours]
+7. Every reply MUST contain at least one sentence of visible text. Never output [HUMAN_HANDOFF] or an OPTIONS line on its own.
 `;
 
 // ── Industry config ───────────────────────────────────────────────────────────
@@ -600,6 +605,7 @@ const INDUSTRIES = {
     opening: "Hi! Welcome to Bella's Salon. How can I help you today?",
     starters: ["What's your pricing?", "I want a keratin treatment", "Book an appointment", "Do you do bridal packages?"],
     placeholder: "Try: How much is a haircut?",
+    phone: '+1 (212) 555-0192',
   },
   restaurant: {
     name: 'The Rustic Table',
@@ -608,6 +614,7 @@ const INDUSTRIES = {
     opening: "Hi! Welcome to The Rustic Table. How can I help you today?",
     starters: ["Can I see the menu?", "Book a table for tonight", "Do you have vegan options?", "Is it good for a date?"],
     placeholder: "Try: What's your best dish?",
+    phone: '+1 (212) 555-0847',
   },
   clinic: {
     name: 'ClearSkin Clinic',
@@ -616,6 +623,7 @@ const INDUSTRIES = {
     opening: "Hi! Welcome to ClearSkin Clinic. How can I help you today?",
     starters: ["How much is Botox?", "I have acne issues", "Book a consultation", "Do you do laser hair removal?"],
     placeholder: "Try: What treatments do you offer?",
+    phone: '+1 (212) 555-0364',
   },
   dental: {
     name: 'BrightSmile Dental',
@@ -624,6 +632,7 @@ const INDUSTRIES = {
     opening: "Hi! Welcome to BrightSmile Dental Care. How can I help you today?",
     starters: ["How much is teeth whitening?", "I have a toothache", "Do you take insurance?", "Tell me about Invisalign"],
     placeholder: "Try: Do you see kids?",
+    phone: '+1 (212) 555-0731',
   },
   realestate: {
     name: 'PrimeNest Realty',
@@ -632,6 +641,7 @@ const INDUSTRIES = {
     opening: "Hi! Welcome to PrimeNest Realty. How can I help you today?",
     starters: ["I'm looking to rent in Dubai Marina", "Can foreigners buy property?", "Tell me about off-plan", "What are the buying costs?"],
     placeholder: "Try: What's a 1BR in Downtown?",
+    phone: '+971 4 555 0593',
   },
   homeservices: {
     name: 'AllFix Electrical & Heating',
@@ -640,6 +650,7 @@ const INDUSTRIES = {
     opening: "Hi! Welcome to AllFix Electrical & Heating. How can I help you today?",
     starters: ["My boiler isn't working", "What do you charge?", "I need an electrician today", "Tell me about heat pumps"],
     placeholder: "Try: My heating stopped working...",
+    phone: '+353 61 555 0418',
   },
 };
 
@@ -762,12 +773,17 @@ const renderChips = (options) => {
   container.id = 'starter-chips';
   container.className = 'starter-chips';
 
-  options.forEach(text => {
+  // An option is either a plain string (sent as a message) or { label, onClick }.
+  options.forEach(opt => {
+    const label = typeof opt === 'string' ? opt : opt.label;
     const chip = document.createElement('button');
     chip.className = 'starter-chip';
-    chip.textContent = text;
+    chip.textContent = label;
     chip.addEventListener('click', () => {
-      inputEl.value = text;
+      if (isBotTyping) return;
+      if (typeof opt !== 'string') return opt.onClick();
+      if (label.toLowerCase() === HUMAN_CHIP.toLowerCase()) return connectToHuman();
+      inputEl.value = label;
       sendMessage();
     });
     container.appendChild(chip);
@@ -786,17 +802,34 @@ const removeStarterChips = () => {
 
 // Splits Claude's raw reply into display text + tappable options.
 // Tolerates a truncated "[OPTIONS: a | b | c" line (missing closing bracket).
+// Never returns empty text, and flags replies that need a human.
+const HUMAN_CHIP = 'Talk to a human';
+
 const parseReply = (raw) => {
+  const handoff = /\[HUMAN_HANDOFF\]/.test(raw);
   const text = raw.replace(/\[HUMAN_HANDOFF\]/g, '');
   const match = text.match(/\[OPTIONS:([\s\S]*?)(\]|$)/i);
-  if (!match) return { text: text.trim(), options: [] };
 
-  let options = match[1].split('|').map(o => o.trim()).filter(Boolean);
-  if (match[2] !== ']') options = options.slice(0, -1); // last option may be cut off
-  return {
-    text: text.replace(match[0], '').trim(),
-    options: options.slice(0, 4),
-  };
+  let body = text;
+  let options = [];
+  if (match) {
+    options = match[1].split('|').map(o => o.trim()).filter(Boolean);
+    if (match[2] !== ']') options = options.slice(0, -1); // last option may be cut off
+    body = text.replace(match[0], '');
+  }
+  body = body.trim();
+  options = options.slice(0, 4);
+
+  if (handoff) {
+    if (!body) body = `I'll connect you with our team at ${INDUSTRIES[activeIndustry].name} so they can help you personally.`;
+    if (!options.some(o => o.toLowerCase() === HUMAN_CHIP.toLowerCase())) {
+      options = [...options.slice(0, 3), HUMAN_CHIP];
+    }
+  }
+  if (!body) body = "Sorry, I didn't catch that. Could you rephrase, or would you like to talk to our team?";
+  if (!options.length) options = ['Ask another question', HUMAN_CHIP];
+
+  return { text: body, options, handoff };
 };
 
 // ── Placeholder rotation ─────────────────────────────────────────────────────
@@ -874,7 +907,35 @@ const getBotReply = async (userMessage) => {
   }
 
   const data = await response.json();
-  return data.content[0].text;
+  const block = (data.content || []).find(b => b.type === 'text');
+  return block ? block.text : '[HUMAN_HANDOFF]'; // empty reply → parseReply supplies a handoff message
+};
+
+// ── Human handoff (simulated) ────────────────────────────────────────────────
+const connectToHuman = async () => {
+  if (isBotTyping) return;
+  isBotTyping = true;
+  setInputDisabled(true);
+  removeStarterChips();
+
+  const industry = INDUSTRIES[activeIndustry];
+  addMessage('user', HUMAN_CHIP);
+  showTypingIndicator();
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  hideTypingIndicator();
+  markLastUserMessageRead();
+  playNotificationSound();
+
+  const reply = `Done! A team member from ${industry.name} has been alerted and will reply here shortly. Need us sooner? Call ${industry.phone}.`;
+  addMessage('bot', reply);
+  renderChips([{ label: 'Ask something else', onClick: () => { removeStarterChips(); renderStarterChips(); } }]);
+
+  conversationHistory.push({ role: 'user', content: HUMAN_CHIP }, { role: 'assistant', content: reply });
+  conversationHistory = conversationHistory.slice(-6);
+
+  isBotTyping = false;
+  setInputDisabled(false);
+  inputEl.focus();
 };
 
 // ── Send message flow ─────────────────────────────────────────────────────────
@@ -911,7 +972,12 @@ const sendMessage = async () => {
     }
   } catch (err) {
     hideTypingIndicator();
-    addMessage('bot', "Sorry, I'm having a technical issue right now. Please try again in a moment!");
+    conversationHistory.pop(); // drop the unanswered user message so history stays valid
+    addMessage('bot', "Sorry, I hit a snag on my side. You can try again, or I can connect you with our team.");
+    renderChips([
+      { label: 'Try again', onClick: () => { inputEl.value = text; sendMessage(); } },
+      HUMAN_CHIP,
+    ]);
     console.error('[demo] API error:', err.message);
   }
 
