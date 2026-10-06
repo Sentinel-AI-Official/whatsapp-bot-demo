@@ -578,6 +578,19 @@ ESCALATE TO HUMAN (output [HUMAN_HANDOFF] on its own line) when:
 - Customer mentions a commercial or multi-unit building
 `.trim();
 
+// ── Shared chat style (appended to every industry prompt; overrides length rules above) ──
+const CHAT_STYLE_RULES = `
+
+CHAT STYLE — these rules OVERRIDE any earlier rule about reply length or asking several questions:
+1. Keep every reply SHORT: 1–3 short sentences, about 40 words max. No lists, no long paragraphs, no info dumps. Give only what was asked, then move the chat forward.
+2. Ask only ONE question per reply. If you need several details, ask them one at a time across the conversation.
+3. Whenever you ask a question or the customer has a clear next step, end your reply with ONE final line in exactly this format:
+[OPTIONS: Option one | Option two | Option three]
+Give 3 or 4 options, each 1–4 words, written as what the customer would tap (e.g. "Under AED 1M", "Book a visit", "Just browsing"). Options must be the natural answers to your question, or the most useful next steps. Do not put the options anywhere else in the reply, and never repeat them in the sentence above.
+4. Skip the OPTIONS line only when you output [HUMAN_HANDOFF] or the customer has said goodbye.
+5. If the customer needs a link or phone number, include it in the short reply and still offer options.
+`;
+
 // ── Industry config ───────────────────────────────────────────────────────────
 const INDUSTRIES = {
   salon: {
@@ -738,19 +751,18 @@ const setInputDisabled = (disabled) => {
   sendBtn.disabled = disabled;
 };
 
-// ── Starter chips ────────────────────────────────────────────────────────────
-const renderStarterChips = () => {
+// ── Starter / reply-option chips ─────────────────────────────────────────────
+const renderChips = (options) => {
   const existing = document.getElementById('starter-chips');
   if (existing) existing.remove();
 
-  const industry = INDUSTRIES[activeIndustry];
-  if (!industry.starters || !industry.starters.length) return;
+  if (!options || !options.length) return;
 
   const container = document.createElement('div');
   container.id = 'starter-chips';
   container.className = 'starter-chips';
 
-  industry.starters.forEach(text => {
+  options.forEach(text => {
     const chip = document.createElement('button');
     chip.className = 'starter-chip';
     chip.textContent = text;
@@ -765,9 +777,26 @@ const renderStarterChips = () => {
   scrollToBottom();
 };
 
+const renderStarterChips = () => renderChips(INDUSTRIES[activeIndustry].starters);
+
 const removeStarterChips = () => {
   const el = document.getElementById('starter-chips');
   if (el) el.remove();
+};
+
+// Splits Claude's raw reply into display text + tappable options.
+// Tolerates a truncated "[OPTIONS: a | b | c" line (missing closing bracket).
+const parseReply = (raw) => {
+  const text = raw.replace(/\[HUMAN_HANDOFF\]/g, '');
+  const match = text.match(/\[OPTIONS:([\s\S]*?)(\]|$)/i);
+  if (!match) return { text: text.trim(), options: [] };
+
+  let options = match[1].split('|').map(o => o.trim()).filter(Boolean);
+  if (match[2] !== ']') options = options.slice(0, -1); // last option may be cut off
+  return {
+    text: text.replace(match[0], '').trim(),
+    options: options.slice(0, 4),
+  };
 };
 
 // ── Placeholder rotation ─────────────────────────────────────────────────────
@@ -831,7 +860,7 @@ const getBotReply = async (userMessage) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      system: INDUSTRIES[activeIndustry].prompt,
+      system: INDUSTRIES[activeIndustry].prompt + CHAT_STYLE_RULES,
       messages: [
         ...conversationHistory,
         { role: 'user', content: userMessage },
@@ -872,8 +901,9 @@ const sendMessage = async () => {
     markLastUserMessageRead();
     playNotificationSound();
 
-    const cleanReply = reply.replace('[HUMAN_HANDOFF]', '').trim();
+    const { text: cleanReply, options } = parseReply(reply);
     addMessage('bot', cleanReply);
+    renderChips(options);
 
     conversationHistory.push({ role: 'assistant', content: cleanReply });
     if (conversationHistory.length > 6) {
