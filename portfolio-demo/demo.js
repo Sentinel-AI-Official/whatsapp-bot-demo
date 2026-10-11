@@ -659,6 +659,24 @@ let conversationHistory = [];
 let isBotTyping = false;
 let activeIndustry = 'salon';
 
+// ── Trial limit ───────────────────────────────────────────────────────────────
+// Visitors get MAX_TRIAL_MESSAGES replies in total (across all industries and "new chat"),
+// remembered in localStorage so a page refresh doesn't hand out a fresh trial.
+const MAX_TRIAL_MESSAGES  = 7;
+const TRIAL_STORAGE_KEY   = 'sellvio_demo_message_count';
+const TRIAL_ENDED_MESSAGE = 'Thank you for taking a trial of the WhatsApp Agent. Kindly contact Sellvio for further communication.';
+const SELLVIO_URL         = 'https://sellvio.co';
+
+let trialMessageCount = 0;
+try { trialMessageCount = parseInt(localStorage.getItem(TRIAL_STORAGE_KEY), 10) || 0; } catch (e) { /* storage blocked */ }
+
+const trialEnded = () => trialMessageCount >= MAX_TRIAL_MESSAGES;
+
+const recordTrialMessage = () => {
+  trialMessageCount += 1;
+  try { localStorage.setItem(TRIAL_STORAGE_KEY, String(trialMessageCount)); } catch (e) { /* storage blocked */ }
+};
+
 // ── DOM references ────────────────────────────────────────────────────────────
 const messagesEl = document.getElementById('messages');
 const inputEl    = document.getElementById('user-input');
@@ -758,8 +776,9 @@ const hideTypingIndicator = () => {
 };
 
 const setInputDisabled = (disabled) => {
-  inputEl.disabled = disabled;
-  sendBtn.disabled = disabled;
+  const locked = disabled || trialEnded(); // once the trial is over the input never re-enables
+  inputEl.disabled = locked;
+  sendBtn.disabled = locked;
 };
 
 // ── Starter / reply-option chips ─────────────────────────────────────────────
@@ -835,8 +854,19 @@ const parseReply = (raw) => {
 // ── Placeholder rotation ─────────────────────────────────────────────────────
 const updatePlaceholder = () => {
   const industry = INDUSTRIES[activeIndustry];
-  inputEl.placeholder = industry.placeholder || 'Type a message';
+  inputEl.placeholder = trialEnded() ? 'Trial ended' : (industry.placeholder || 'Type a message');
 };
+
+// ── Trial ended ──────────────────────────────────────────────────────────────
+const showTrialEnded = () => {
+  addMessage('bot', TRIAL_ENDED_MESSAGE);
+  renderChips([{ label: 'Contact Sellvio', onClick: () => window.open(SELLVIO_URL, '_blank', 'noopener') }]);
+  updatePlaceholder();
+  setInputDisabled(true);
+};
+
+// Chips for a fresh chat — or the trial-ended notice if the visitor has used up their messages.
+const renderStartState = () => (trialEnded() ? showTrialEnded() : renderStarterChips());
 
 // ── Industry switcher ─────────────────────────────────────────────────────────
 const initIndustry = (key) => {
@@ -849,7 +879,7 @@ const initIndustry = (key) => {
   conversationHistory  = [];
   addMessage('bot', industry.opening);
   conversationHistory.push({ role: 'assistant', content: industry.opening });
-  renderStarterChips();
+  renderStartState();
   updatePlaceholder();
 
   document.querySelectorAll('.industry-btn').forEach(btn => {
@@ -879,7 +909,7 @@ const resetChat = () => {
     conversationHistory = [];
     addMessage('bot', industry.opening);
     conversationHistory.push({ role: 'assistant', content: industry.opening });
-    renderStarterChips();
+    renderStartState();
     messagesEl.classList.remove('fade-out');
     messagesEl.classList.add('fade-in');
     setTimeout(() => messagesEl.classList.remove('fade-in'), 300);
@@ -941,7 +971,7 @@ const connectToHuman = async () => {
 // ── Send message flow ─────────────────────────────────────────────────────────
 const sendMessage = async () => {
   const text = inputEl.value.trim();
-  if (!text || isBotTyping) return;
+  if (!text || isBotTyping || trialEnded()) return;
 
   inputEl.value = '';
   isBotTyping   = true;
@@ -964,7 +994,9 @@ const sendMessage = async () => {
 
     const { text: cleanReply, options } = parseReply(reply);
     addMessage('bot', cleanReply);
-    renderChips(options);
+    recordTrialMessage(); // only successful replies count, so an API error doesn't burn a trial message
+    if (trialEnded()) showTrialEnded();
+    else renderChips(options);
 
     conversationHistory.push({ role: 'assistant', content: cleanReply });
     if (conversationHistory.length > 6) {
