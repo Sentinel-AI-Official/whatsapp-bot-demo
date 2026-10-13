@@ -411,9 +411,34 @@ body {
     width: 100%;
   }
 
+  .industry-switcher {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .industry-switcher::-webkit-scrollbar {
+    display: none;
+  }
+
+  .industry-btn {
+    padding: 6px 12px;
+    flex-shrink: 0;
+  }
+
   .whatsapp-container {
-    height: calc(100vh - 58px);
+    height: calc(100vh - 52px);
+    height: calc(100dvh - 52px);
     border-radius: 0;
     box-shadow: none;
+  }
+
+  /* 16px+ inputs stop iOS Safari zooming the page when the field is focused */
+  .wa-input {
+    font-size: 16px;
   }
 }
